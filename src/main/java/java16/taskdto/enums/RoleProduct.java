@@ -1,5 +1,5 @@
 package java16.taskdto.enums;
 
-public enum Role {
+public enum RoleProduct {
     APARTMENT,HOUSE
 }

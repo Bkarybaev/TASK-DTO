@@ -1,4 +1,6 @@
 package java16.taskdto.enums;
 
-public class RoleUsers {
+public enum RoleUser {
+    ADMIN,
+    OWNER
 }
