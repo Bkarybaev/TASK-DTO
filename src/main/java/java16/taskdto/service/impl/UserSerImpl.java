@@ -15,6 +15,7 @@ import java16.taskdto.service.UserService;
 import java16.taskdto.validation.RegexPattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +48,9 @@ public class UserSerImpl implements UserService {
         }
 
         // find by email user
-        User first = userRepo.findByGmail(user.getEmail()).orElseThrow(() -> new UserNotFound(user.getEmail() + " user po etaoi email not found!"));
+        User first = userRepo.findByGmail
+                (user.getEmail()).orElseThrow(()
+                -> new UserNotFound(user.getEmail() + " user po etoi email not found!"));
 
         boolean matches = passwordEncoder.matches(user.getPassword(),first.getPassword());
 
@@ -60,31 +63,31 @@ public class UserSerImpl implements UserService {
 
     //register
     @Override
-    public SimpleRequest save(RegisterRequest newUser) {
+    public ResponseEntity<?> save(RegisterRequest newUser) {
 
         //check email pattern
         if (!RegexPattern.emailPattern(newUser.getEmail())) {
-            return SimpleRequest.builder()
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(SimpleRequest.builder()
                     .message("email invalid try again!!")
                     .status(HttpStatus.CONFLICT)
-                    .build();
+                    .build());
         }
 
         //check password pattern
         if (!RegexPattern.passwordPattern(newUser.getPassword())) {
-            return SimpleRequest.builder()
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(SimpleRequest.builder()
                     .message("password invalid try again!!")
                     .status(HttpStatus.CONFLICT)
-                    .build();
+                    .build());
         }
 
         //check email don't already in use
         User user = userRepo.findByGmail(newUser.getEmail()).orElse(null);
         if (user != null) {
-            return SimpleRequest.builder()
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(SimpleRequest.builder()
                     .message("email already in use try again!!")
                     .status(HttpStatus.CONFLICT)
-                    .build();
+                    .build());
         }
         User user1 = new User();
         user1.setUserName(newUser.getUsername());
@@ -94,22 +97,25 @@ public class UserSerImpl implements UserService {
         user1.setRoleUser(newUser.getRole());
         //save user
         userRepo.save(user1);
-        return SimpleRequest.builder()
+        return ResponseEntity.ok().body(SimpleRequest.builder()
                 .message("success")
                 .status(HttpStatus.OK)
-                .build();
+                .build());
     }
 
 
     //get by email
     @Override
     public Optional<User> findByEmail(String username) {
-        return Optional.ofNullable(userRepo.findByGmail(username).orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found")));
+        return Optional.ofNullable(
+                userRepo.findByGmail(username)
+                        .orElseThrow(()
+                                -> new UsernameNotFoundException("User " + username + " not found")));
     }
 
     @Override
     public boolean deleteByIdUser(Long id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new UserNotFound("User " + id + " not found"));
+        User user = userRepo.findByIdExeption(id);
         if (user != null) {
             userRepo.deleteById(id);
             return true;
@@ -125,7 +131,10 @@ public class UserSerImpl implements UserService {
         if (byGmail == null) {
             user.setRoleUser(RoleUser.ADMIN);
             user.setUserName("admin");
-            user.setPassword(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("Admin123!"));
+            user.setPassword(
+                    PasswordEncoderFactories
+                            .createDelegatingPasswordEncoder()
+                            .encode("Admin123!"));
             user.setEmail(email);
             userRepo.save(user);
         }

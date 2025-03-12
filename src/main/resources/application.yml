@@ -8,6 +8,9 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  security:
+    jwt:
+      secret_key: baielKarybaev123
 server:
   port: 8081
 

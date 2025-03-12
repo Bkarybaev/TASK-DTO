@@ -9,7 +9,6 @@ import java16.taskdto.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,7 +29,7 @@ public class UserApi {
 
     //this is register
     @PostMapping("/register")
-    public SimpleRequest register(@RequestBody RegisterRequest newUser) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest newUser) {
         return userService.save(newUser);
     }
 

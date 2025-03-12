@@ -13,10 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -59,7 +63,7 @@ public class ProductSerImpl implements ProductService {
     //get by id
     @Override
     public ProductResponse findById(Long id) {
-        Product product = productRepo.findById(id).orElseThrow(()-> new RuntimeException("Product not found"));
+        Product product = productRepo.findByIdException(id);
         return ProductResponse.builder()
                 .title(product.getTitle())
                 .address(product.getAddress())
@@ -79,9 +83,13 @@ public class ProductSerImpl implements ProductService {
                 .build();
     }
 
+    //get all method pagination
     @Override
     public PaginationResponse<ProductResponse> findAllWithPagination(int pageNumber, int sizePage) {
-        Pageable pageable = PageRequest.of(pageNumber-1, sizePage);
+        Pageable pageable = PageRequest.of(
+                pageNumber-1,
+                sizePage,
+                Sort.by("address").ascending());
         Page<Product> all = productRepo.findAll(pageable);
         var paginationResponse = new PaginationResponse<ProductResponse>();
         paginationResponse.setProducts(findByProducts(all.getContent()));

@@ -9,6 +9,7 @@ import lombok.Setter;
 @Data
 public class LoginDto {
     @EmailValidation
+    @Email
     private String email;
     private String password;
 }

@@ -1,4 +1,5 @@
 package java16.taskdto.api;
+import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import java16.taskdto.enums.Region;
 import java16.taskdto.request.ProductRequest;
@@ -33,6 +34,7 @@ public class ProductApi {
     }
 
     //get all products
+    @PreAuthorize("denyAll()")
     @GetMapping("/getAll")
     public List<ProductResponse> getAll() {
         return productService.findAll();
