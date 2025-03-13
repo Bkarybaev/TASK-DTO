@@ -1,6 +1,13 @@
 package java16.taskdto.enums;
 
-public enum RoleUser {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum RoleUser implements GrantedAuthority {
     ADMIN,
-    OWNER
+    OWNER;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

@@ -23,7 +23,7 @@ public class UserApi {
 
     //this is login
     @GetMapping("/login")
-    public User login(@RequestBody LoginDto user) {
+    public ResponseEntity<?>  login(@RequestBody LoginDto user) {
         return userService.login(user);
     }
 

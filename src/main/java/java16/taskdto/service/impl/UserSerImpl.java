@@ -2,6 +2,7 @@ package java16.taskdto.service.impl;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import java16.taskdto.config.jwt.JwtService;
 import java16.taskdto.entityes.User;
 import java16.taskdto.enums.RoleUser;
 import java16.taskdto.exceptions.EmailInvalid;
@@ -11,6 +12,7 @@ import java16.taskdto.repo.UserRepo;
 import java16.taskdto.request.LoginDto;
 import java16.taskdto.request.RegisterRequest;
 import java16.taskdto.request.SimpleRequest;
+import java16.taskdto.response.AuthResponse;
 import java16.taskdto.service.UserService;
 import java16.taskdto.validation.RegexPattern;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ import java.util.Optional;
 public class UserSerImpl implements UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
 
 
     //auth
@@ -37,7 +41,7 @@ public class UserSerImpl implements UserService {
 
     //login
     @Override
-    public User login(LoginDto user) {
+    public ResponseEntity<?> login(LoginDto user) {
         // email pattern check
         if (!RegexPattern.emailPattern(user.getEmail())) {
             throw new EmailInvalid(user.getEmail() + " try again!!");
@@ -58,7 +62,13 @@ public class UserSerImpl implements UserService {
         if (!matches) {
              throw new UserNotFound("User password дал келбеди!");
         }
-            return first;
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    AuthResponse.builder()
+                            .token(jwtService.generateToken(first))
+                            .email(first.getEmail())
+                            .role(first.getRoleUser())
+                            .build()
+            );
     }
 
     //register
@@ -96,11 +106,13 @@ public class UserSerImpl implements UserService {
         user1.setEmail(newUser.getEmail());
         user1.setRoleUser(newUser.getRole());
         //save user
-        userRepo.save(user1);
-        return ResponseEntity.ok().body(SimpleRequest.builder()
-                .message("success")
-                .status(HttpStatus.OK)
-                .build());
+        User save = userRepo.save(user1);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(AuthResponse.builder()
+                .token(jwtService.generateToken(save))
+                .email(save.getEmail())
+                        .role(save.getRoleUser())
+                        .build());
     }
 
 

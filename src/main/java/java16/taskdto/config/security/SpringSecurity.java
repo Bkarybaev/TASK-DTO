@@ -1,5 +1,6 @@
-package java16.taskdto.config;
+package java16.taskdto.config.security;
 
+import java16.taskdto.config.jwt.JwtFilter;
 import java16.taskdto.exceptions.UserNotFound;
 import java16.taskdto.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +33,15 @@ public class SpringSecurity {
         http.authorizeHttpRequests((authorize) ->
                 authorize
                         .requestMatchers(
+                                "/**",
                                 "/api/users/register",
-                                "/api/users/login"
+                                "/api/users/login",
+                                "/swagger-ui/index.html/**"
                         ).permitAll()
-                        .requestMatchers("/api/product/save_AllProduct").permitAll()
+//                        .requestMatchers("/api/product/save_AllProduct").permitAll()
                         .anyRequest().authenticated());
-        http.csrf(AbstractHttpConfigurer::disable);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.csrf(AbstractHttpConfigurer::disable);
 //        http.httpBasic(Customizer.withDefaults());
         return http.build();
     }
