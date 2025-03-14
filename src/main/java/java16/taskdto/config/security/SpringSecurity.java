@@ -61,10 +61,8 @@ public class SpringSecurity {
     }
 
     public UserDetailsService userDetailsService() {
-
         return email ->
             userService.findByGmail(email).orElseThrow(() -> new UserNotFound("User " + email + " not found"));
-
     }
 
 //    @Bean

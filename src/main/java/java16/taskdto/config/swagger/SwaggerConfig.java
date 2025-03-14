@@ -20,9 +20,9 @@ public class SwaggerConfig {
         return  new OpenAPI()
                 .components(new Components()
                         .addSecuritySchemes(API_KEY, apiKeySecurityScheme()))
-                .info(new Info().title("task dto").description("simple endpoints"));
+                .info(new Info().title("task dto").description("simple endpoints"))
 
-//                .security(Collections.singletonList(new SecurityRequirement().addList(API_KEY)));
+                .security(Collections.singletonList(new SecurityRequirement().addList(API_KEY)));
 
     }
     public SecurityScheme apiKeySecurityScheme(){
